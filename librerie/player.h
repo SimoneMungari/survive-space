@@ -5,6 +5,7 @@
 
 using namespace std;
 
+
 class Player
 {
 	private:
@@ -26,12 +27,12 @@ class Player
 		int getEnemyKilled() const;
 		void setEnemyKilled(int);
 		void setVita(int);
-		void Su();
-		void Giu();
-		void Destra();
-		void Sinistra();
+		void Su();	//Movimento della navicella verso su
+		void Giu();	// verso giu
+		void Destra();	// verso destra
+		void Sinistra();// verso sinistra
 		void Cambio_vita(int);
-		void visualizza_stat() const;
+		void visualizza_stat() const; //Stampa del punteggio e della vita attuale
 		void visualizza_player() const;
 		void cancella_player() const;
 		bool controlloCollisione(int,int) const;

@@ -11,7 +11,7 @@ extern void *sparato(void *);
 
 //FUNZIONI THREAD PLAYER E PROIETTILE
 
-void * sparato(void *arg)
+void * sparato(void *arg)	//Inizio thread proiettile
 {
 	switch(dirProiettile)
 	{
@@ -24,7 +24,7 @@ void * sparato(void *arg)
 
 void movimentoPlayer(int mossa)
 {
-	if(mossa<97)
+	if(mossa<97)	//Controllo se il tasto premuto è in maiuscolo, lo rende minuscolo
 		mossa+=32;
 
 	switch(mossa)
@@ -51,9 +51,9 @@ void movimentoPlayer(int mossa)
 		}
 		case 'w':
 		{
-			pthread_t pProiettile1;
-			dirProiettile=1;			
-			pthread_create(&pProiettile1,NULL,sparato,NULL);
+			pthread_t pProiettile1;				//Dichiarazione thread proiettile
+			dirProiettile=1;				//Inizializzata la direzione
+			pthread_create(&pProiettile1,NULL,sparato,NULL);//Il thread è partito invocando la funzione "sparato"
 			break;
 		}
 		case 'a':
@@ -85,22 +85,21 @@ void movimentoPlayer(int mossa)
 
 void playerF()
 {
-	noecho();
-	int mossa;
-	player=new Player();
+	int mossa=0;
+	player=new Player();	//Costruzione dell'oggetto player
 	stampaCampoGioco();
 	while(running)
 	{
-		pthread_mutex_lock(&mutexGame);
+		pthread_mutex_lock(&mutexGame); 	//Mutex bloccato
 		attron(COLOR_PAIR(1));
-		player->visualizza_player();
+		player->visualizza_player();		//Stampe della vita, punteggio e della navicella
 		attroff(COLOR_PAIR(1));
 		player->visualizza_stat();
 		refresh();
-		mossa=getch();
-		pthread_mutex_unlock(&mutexGame);
-		movimentoPlayer(mossa);
-		if(player->getVita()<=0)
+		mossa=getch();				//Prende in input il tasto premuto dall'utente
+		pthread_mutex_unlock(&mutexGame);	//Mutex sbloccato
+		movimentoPlayer(mossa);			//Chiamata funzione movimentoPlayer alla quale viene passato il comando 
+		if(player->getVita()<=0)		//Controllo se la vita è <=0 il gioco finisce
 			running=false;
 
 	}
@@ -111,47 +110,49 @@ void sparaSu()
 {
 	if(running==false)
 		return;	
-	bool collisione, collisionePro=false;
+	bool collisione=false, collisionePro=false;
 	int ytemp=player->getY()+1;
 	int i=player->getX()-2;	
-	int numEnemyMorto;
 	int dir=0,dirprec=0;
-	for(i;i>=0;i--)
+	for(i;i>=-1;i--)	//For che muove il proiettile da sotto verso sopra, quindi i-- e si ferma quando arriva a -1 (al limite)
 	{
-		collisione=player->controlloCollisione(i,ytemp-1);
-		for(int k=0;k<nNemici;k++)
+		collisione=player->controlloCollisione(i,ytemp-1); //Controlla la collisione con la base
+		for(int k=0;k<nNemici;k++)	//For che scorre i nemici per controllare se c'è stato uno scontro proiettile-nemico
 		{
-			if(enemy[k]->getY()==ytemp && (enemy[k]->getX()==i || enemy[k]->getX()==(i-1)))
+			if(enemy[k]->getY()==ytemp && (enemy[k]->getX()==i || enemy[k]->getX()==(i-1))) //controllo coordinate
 			{
-				if(enemy[k]->getDeath()==false)
+				if(enemy[k]->getDeath()==false)	//Se entra nell'if vuol dire che il nemico è stato colpito
 				{
-					enemy[k]->setDeath(true);
-					pthread_mutex_lock(&mutexGame);
-					enemy[k]->cancellaEnemy(true);
-					pthread_mutex_unlock(&mutexGame);
-					enemy[k]->setX(LINES+1);
-					collisionePro=true;
+					enemy[k]->setDeath(true);	//Il nemico muore
+					pthread_mutex_lock(&mutexGame);	//Mutex bloccato
+					enemy[k]->cancellaEnemy(true);	//Cancella il nemico nella sua posizione attuale
+					pthread_mutex_unlock(&mutexGame);//Mutex sbloccato
+					enemy[k]->setX(LINES+1);	//Il nemico viene spostato fuori dallo schermo nell'attesa che gli
+					collisionePro=true;		//venga assegnata un'altra posizione, quindi collisione con proiettile
+									// va a true
 				}
 				break;
 			}
 		}
-		if(collisionePro)
-			break;
-		if(collisione)
-			i--;	
-		pthread_mutex_lock(&mutexGame);
-		mvprintw(i,ytemp,"^");
+		if(collisionePro)	//	Se c'è stata collisione proiettile-nemico, esce dal for
+			break;		//	
+		if(collisione)		//	Se c'è stata collisione con la base, salta il blocco e va avanti
+			i--;		//
+		pthread_mutex_lock(&mutexGame);	//Mutex bloccato
+		mvprintw(i,ytemp,"^");		//Stampa proiettile
 		refresh();
-		pthread_mutex_unlock(&mutexGame);
+		pthread_mutex_unlock(&mutexGame);	//Mutex sbloccato
 		usleep(20000);
-		pthread_mutex_lock(&mutexGame);
-		mvprintw(i,ytemp," ");
+		pthread_mutex_lock(&mutexGame);	//Mutex bloccato
+		mvprintw(i,ytemp," ");		//cancella il proiettile precedente
 		refresh();
-		pthread_mutex_unlock(&mutexGame);
+		pthread_mutex_unlock(&mutexGame);//Mutex sbloccato
 		if(running==false)
 			break;
 	}
 }
+
+	//Ragionamento uguale anche per gli altri versi (giu, destra, sinitra), l'unica differenza è lo spostamento del proiettile	
 
 void sparaGiu()
 {	
@@ -159,7 +160,8 @@ void sparaGiu()
 		return;
 	bool collisione, collisionePro=false;
 	int ytemp=player->getY()+1;
-	for(int i=player->getX()+2;i<=LINES;i++)
+	int i=player->getX()+2;
+	for(i;i<=LINES;i++)
 	{
 		collisione=player->controlloCollisione(i,ytemp-1);
 		for(int k=0;k<nNemici;k++)

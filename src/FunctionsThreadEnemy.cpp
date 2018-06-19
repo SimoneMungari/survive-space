@@ -7,45 +7,45 @@ extern void controlloDifficolta(bool[]);
 
 //FUNZIONI THREAD ENEMY
 
-void *enemyInit(void * args)
+void *enemyInit(void * args)	//Viene invocato il thread pEnemy tramite la funzione enemyInit
 {
-	movimentoEnemy();
+	movimentoEnemy();	//Chiama la funzione che si occupa del movimento autonomo dei nemici
 }
 
 void movimentoEnemy()
 {
-	soundB.loadFromFile("../music/gun.wav");
+	soundB.loadFromFile("../music/gun.wav");	//Inizializzazione dei suoni di "morte" dei nemici
 	sound.setBuffer(soundB);
 	sound.setVolume(80);
-	bool step[10]={true,false,false,false,false,false,false,false,false,false};
+	bool step[10]={true,false,false,false,false,false,false,false,false,false}; //Array di boolean per il controlloDifficoltà
 	int dir=0,dirprec=0;
 	for(int i=0;i<16;i++)
 	{
-		dir=(rand()%80)+1;
-		enemy[i]->update(dir);
+		dir=(rand()%80)+1;	//Numero casuale da 1 ad 80 per lo "spawn" dei nemici
+		enemy[i]->update(dir);	//Vengono aggiornate le posizioni di partenza dei nemici
 	}
 	while(running)
 	{
 		for(int i=0;i<nNemici;i++)
 		{
-			pthread_mutex_lock(&mutexGame);
-			enemy[i]->movimento(player);
-			enemy[i]->cancellaEnemy(false);
-			refresh();
-			pthread_mutex_unlock(&mutexGame);
-			if(enemy[i]->getDeath()==true)
+			pthread_mutex_lock(&mutexGame);	//Blocca il mutex
+			enemy[i]->movimento(player);	//
+			enemy[i]->cancellaEnemy(false);	// Fa il movimento del nemico e cancella la posizione precedente
+			refresh();			//
+			pthread_mutex_unlock(&mutexGame);//Sblocca il mutex
+			if(enemy[i]->getDeath()==true)	//Se il nemico è morto
 			{
 				sound.play();
-				enemy[i]->setDeath(false);
+				enemy[i]->setDeath(false);	//Resuscita
 				do{
-					dir=(rand()%80)+1;
-				}while(dir==dirprec);
+					dir=(rand()%80)+1;	//Ma in una posizione differente
+				}while(dir==dirprec);		//Mini controllo che due nemici non nascano nella stessa posizione
 				dirprec=dir;
-				enemy[i]->update(dir);
+				enemy[i]->update(dir);		//Aggiorna la posizione del nemico precedentemente morto
 			}
 		}
 		usleep(900000);
-		controlloDifficolta(step);
+		controlloDifficolta(step);	//Invocazione della funzione per controllare la difficoltà con passaggio di array "step"
 	}
 }
 
@@ -53,11 +53,11 @@ void movimentoEnemy()
 
 void controlloDifficolta(bool step[])
 {
-	if(player->getEnemyKilled()>10 && step[0])
+	if(player->getEnemyKilled()>10 && step[0])	//Se il numero di nemici morti è > 10 ed è attivo lo step[0]
 	{
 		step[0]=false;
-		step[1]=true;
-		nNemici++;
+		step[1]=true;				//Lo step precedente va a False perchè è finito, lo step successivo si attiva
+		nNemici++;				//Aumenta il numero dei nemici di 1
 		return;
 	}
 	if(player->getEnemyKilled()>20 && step[1])
@@ -116,8 +116,8 @@ void controlloDifficolta(bool step[])
 		nNemici++;
 		return;
 	}
-	if(player->getEnemyKilled()>100 && step[9])
-	{
+	if(player->getEnemyKilled()>100 && step[9])	//I nemici aumentano fino allo step[9], quando il giocatore supera i 100 nemici uccisi
+	{						// ci saranno in gioco 16 oggetti Enemy
 		step[9]=false;
 		nNemici++;
 		return;

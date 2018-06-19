@@ -1,9 +1,9 @@
 #include "../librerie/player.h"
 
-Player::Player()
+Player::Player() //Costruttore vuoto
 {
-	this->x=LINES/2;
-	this->y=COLS/2;
+	this->x=LINES/2;	//Posizione iniziale della navicella
+	this->y=(COLS/2)+1;
 	this->vita=100;
 	this->enemyKilled=0;
 	this->forma="<@>";

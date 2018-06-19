@@ -10,7 +10,6 @@ class Enemy
 		string forma;
 		int x;
 		int y;
-		int vita;
 		int direzione;
 		bool death;
 	
@@ -21,8 +20,6 @@ class Enemy
 		int getY() const;
 		int getDirezione() const;
 		void setX(int);
-		void setDiny(int);
-		void setDinx(int);
 		void setDeath(bool);
 		void update(int);
 		void movimento(Player*);

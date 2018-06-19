@@ -1,10 +1,9 @@
 #include "../librerie/enemy.h"
 
-Enemy::Enemy()
+Enemy::Enemy()	//Costruttore, inizializza le variabili e la posizione iniziale a (0,0)
 {
 
 	forma="#";
-	vita=15;
 	direzione=0;
 	death=false;
 	x=0;
@@ -42,16 +41,14 @@ void Enemy::setDeath(bool x)
 	death=x;
 }
 
-void Enemy::update(int direzione)
+void Enemy::update(int direzione)	//Cambia lo spawn del nemico appena iniziato il gioco e ogniqualvolta muore un nemico
 {
 
-	this->forma="#";
-	this->vita=15;
 	this->direzione=direzione;
 
-	switch(direzione)
+	switch(direzione)	//In base al numero che è uscito dal rand, viene settata una posizione iniziale
 	{
-		case 1:
+		case 1:					//Spawn da sopra
 			{
 				this->x=0;
 				this->y=(COLS/2)-16;
@@ -250,7 +247,7 @@ void Enemy::update(int direzione)
 				break;
 			}
 
-		case 34:
+		case 34:				//Spawn da sotto
 			{
 				this->x=LINES;
 				this->y=(COLS/2)-16;
@@ -448,7 +445,7 @@ void Enemy::update(int direzione)
 				this->y=(COLS/2)+16;
 				break;
 			}
-		case 67:
+		case 67:				//Spawn da sinistra
 			{
 				this->x=(LINES/2)-2;
 				this->y=0;
@@ -490,7 +487,7 @@ void Enemy::update(int direzione)
 				this->y=0;
 				break;
 			}
-		case 74:
+		case 74:				//Spawn da destra
 			{
 				this->x=(LINES/2)-2;
 				this->y=COLS;
@@ -537,14 +534,14 @@ void Enemy::update(int direzione)
 
 
 
-void Enemy::visualizzaEnemy(int xtemp, int ytemp) const
+void Enemy::visualizzaEnemy(int xtemp, int ytemp) const		//Stampa del nemico
 {
 	mvprintw(xtemp,ytemp,forma.c_str());	
 }
 
 void Enemy::cancellaEnemy(bool comodo) const
 {
-	if(!comodo)
+	if(!comodo)					//Se comodo==false cancella il nemico nella posizione precedente
 	{
 		if(direzione>=1 && direzione<=33)
 		{
@@ -563,44 +560,44 @@ void Enemy::cancellaEnemy(bool comodo) const
 			mvprintw(x,y+1," ");	
 		}
 	}
-	else
+	else						//Se comodo==true cancella il nemico nella sua posizione attuale
 	{
 		mvprintw(x,y," ");		
 	}
 }
 
-void Enemy::movimento(Player * player)
-{
-	if(direzione>=1 && direzione<=33)
-	{
-		x++;
+void Enemy::movimento(Player * player)			//Movimento del nemico, viene passato un puntatore a Player per la modifica dei valori
+{							// di "Nemici Uccisi", "Vita" e usa la funzione "Controllo Collisione"
+	if(direzione>=1 && direzione<=33)//Spawn da sopra
+	{		
+		x++;			//aggiunge uno alle x cosicchè il nemico scenda	
 		bool collisione;
 		if(death==true)
 		{
-			player->setEnemyKilled(1);
+			player->setEnemyKilled(1);	//Se il nemico è morto, aumenta il punteggio dei nemici uccisi di 1
 			return;
 		}
-		collisione=player->controlloCollisione(x,y+2);
-		if(collisione)
+		collisione=player->controlloCollisione(x,y); //Controlla la collisione con la base del player
+		if(collisione) 	//Se la collisione risulta True, il nemico muore e la vita del giocatore si abbassa di 5 punti
 		{
 			death=true;
 			player->setVita(-5);
 			return;
 		}					
-		attron(COLOR_PAIR(2));
-		visualizzaEnemy(x,y);
+		attron(COLOR_PAIR(2));	//Colora il nemico
+		visualizzaEnemy(x,y);	//Stampa
 		attron(COLOR_PAIR(2));
 	}
-	else if(direzione>=34 && direzione<=66)
+	else if(direzione>=34 && direzione<=66) //Spawn da sotto, ragionamento uguale, unica differenza è lo spostamento
 	{
-		x--;
+		x--;	//Diminuisce le x cosicchè il nemico vada sopra
 		bool collisione;
 		if(death==true)
 		{
 			player->setEnemyKilled(1);
 			return;
 		}					
-		collisione=player->controlloCollisione(x,y+2);
+		collisione=player->controlloCollisione(x,y);
 		if(collisione)
 		{
 			death=true;
@@ -611,16 +608,16 @@ void Enemy::movimento(Player * player)
 		visualizzaEnemy(x,y);
 		attroff(COLOR_PAIR(2));
 	}
-	else if(direzione>=67 && direzione<=73)
+	else if(direzione>=67 && direzione<=73) //Spawn da sinistra, ragionamento uguale, unica differenza è lo spostamento
 	{
-		y++;
+		y++; //Aggiunge uno alle y cosicchè il nemico vada a destra
 		bool collisione;
 		if(death==true)
 		{
 			player->setEnemyKilled(1);
 			return;
 		}
-		collisione=player->controlloCollisione(x,y+2);
+		collisione=player->controlloCollisione(x,y);
 		if(collisione)
 		{
 			death=true;
@@ -631,16 +628,16 @@ void Enemy::movimento(Player * player)
 		visualizzaEnemy(x,y);
 		attroff(COLOR_PAIR(2));
 	}
-	else if(direzione>=74 && direzione<=80)
+	else if(direzione>=74 && direzione<=80) //Spawn da destra, ragionamento uguale, unica differenza è lo spostamento
 	{
 		bool collisione;
-		y--;
+		y--;  //Sottrae uno alle y cosicchè il nemico vada a sinistra
 		if(death==true)
 		{
 			player->setEnemyKilled(1);
 			return;
 		}
-		collisione=player->controlloCollisione(x,y-2);
+		collisione=player->controlloCollisione(x,y-2);//Per controllare la collisione viene mandata la y-2 a causa del cursore
 		if(collisione)
 		{
 			death=true;

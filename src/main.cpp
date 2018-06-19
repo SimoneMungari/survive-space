@@ -51,11 +51,11 @@ int main()
 		cout<<"INSERISCI L'USERNAME (max 9 caratteri)"<<endl;
 		getline(cin,user);
 	}while(user.length()>9);
-	menu();
-	while(running)		
+	menu(); 	//Menu principale
+	while(running)	//Inizio Gioco se running=true
 	{
 		start();
-		if(reset)
+		if(reset)	//In caso di un'altra partita
 		{
 			chiusura();
 			pulisciSchermo();
@@ -64,6 +64,7 @@ int main()
 		}
 		
 	}
+			//Fine gioco
 	return 0;
 
 
@@ -72,13 +73,13 @@ int main()
 
 void menu()
 {
-	soundB.loadFromFile("../music/menuClick.wav");
-	sound.setBuffer(soundB);
+	soundB.loadFromFile("../music/menuClick.wav");	// Inizializzazione suoni e musica per il menu
+	sound.setBuffer(soundB);			
 	sound.setVolume(100);
 	music.setVolume(50);
 	music.openFromFile("../music/menu.wav");
 	music.play();
-	music.setLoop(true);
+	music.setLoop(true);				//Loop=true la musica se finisce deve ricominciare		
 	WINDOW * menuwin= newwin(20,20,COLS/2,LINES/2);
 	menuwin=initscr();
 	start_color();
@@ -89,10 +90,10 @@ void menu()
 	refresh();
 	wrefresh(menuwin);
 	keypad(menuwin,true);
-	string scelte[5]={"GIOCA PARTITA","TUTORIAL","SCOREBOARD", "CREDITI", "ESCI"};
-	int scelta;
-	int evidenziato=0;
-	int sceltafinale=-1;
+	string scelte[5]={"GIOCA PARTITA","TUTORIAL","SCOREBOARD", "CREDITI", "ESCI"};	//Dichiarazione e inizializzazione delle variabili per
+	int scelta=0;									// il menu
+	int evidenziato=0;	// Evidenziato indica dove il cursore è posizionato
+	int sceltafinale=-1;	// 
 	init_pair(5,COLOR_WHITE,COLOR_BLACK);
 	bool menuloop=true;
 	while(menuloop)
@@ -103,96 +104,97 @@ void menu()
 		for(int i=0;i<5;i++)
 		{
 			if(i==evidenziato)
-			wattron(menuwin, A_REVERSE);
-			attron(COLOR_PAIR(5));
-			mvprintw((LINES/2)+i+1,COLS/2-5,scelte[i].c_str());
+			wattron(menuwin, A_REVERSE);	//Evidenzia il testo
+			attron(COLOR_PAIR(5));		//Colora il testo
+			mvprintw((LINES/2)+i+1,COLS/2-5,scelte[i].c_str());	//Stampa "Gioca partita" "Tutorial" ecc ecc
 			attroff(COLOR_PAIR(5));
 			wattroff(menuwin, A_REVERSE);
 		}
-		scelta= getch();
+		scelta= getch();	//Prende in input la scelta del giocatore
 		switch(scelta)
 		{
 			case KEY_UP:
 				{
 					evidenziato--;
-					if(evidenziato==-1)
-					evidenziato=0;
+					if(evidenziato==-1)	//Controllo per non sforare, se sei su "Gioca partita" non puoi andare ancora
+					evidenziato=0;		//più su, quindi rimette evidenziato su 0 che è la prima scelta:"Gioca partita"
 					break;
 				}
 			case KEY_DOWN:
 				{
 					evidenziato++;
-					if(evidenziato==5)
+					if(evidenziato==5) //Stesso controllo per l'ultima scelta
 						evidenziato=4;
 					break;
 				}
 			case '\n':
 				{
-					sound.play();
-					sceltafinale=evidenziato;
+					sound.play(); 
+					sceltafinale=evidenziato; //Salva la scelta dell'utente in base a quale scritta è evidenziata
 					break;
 				}
 			default:
 				break;
 		}
-		switch(sceltafinale)
-		{
-			case 1:{ tutorial(); sceltafinale=-1; break;}
-			case 2:{ scoreboard(); sceltafinale=-1; break;}
-			case 3:{ crediti(); sceltafinale=-1; break;}
+		switch(sceltafinale)	//Se la scelta è fra 1/2/3 rimane dentro il loop perchè dopo aver mostrato i Crediti (esempio) il gioco
+		{			// ritorna al menu, non deve uscire
+			case 1:{ tutorial(); sceltafinale=-1; break;} 	//Se la scelta ricade fra uno di questi, sceltafinale viene impostata
+			case 2:{ scoreboard(); sceltafinale=-1; break;} // a -1, come valore di default per capire che deve rimanere nel while
+			case 3:{ crediti(); sceltafinale=-1; break;}	// 
 			default:{ break;}
 				
 		}
-		if(sceltafinale!=-1)
-			menuloop=false;
+		if(sceltafinale!=-1) //Quindi se la scelta è diversa da -1 (vuol dire che l'utente non ha scelto 1/2/3) allora deve uscire dal
+			menuloop=false; // loop, perchè ciò vuol dire che ha scelto 0/4 (Gioca partita o Esci)
 	}
 	music.stop();
 	pulisciSchermo();
 	endwin();
-	if(sceltafinale==0)
+	if(sceltafinale==0) //L'utente ha scelto "Gioca Partita", imposta running=true così il gioco può iniziare
 		running=true;
-	else if(sceltafinale==4)
+	else if(sceltafinale==4) //L'utente ha scelto "Esci", imposta running=false così il gioco termina
 		running=false;
 }
 
 void preStart()
 {
-	stampaCampoGioco();
+	stampaCampoGioco(); //Stampa il campo di Gioco
 	refresh();
-	soundB.loadFromFile("../music/countdown.wav");
-	sound.setBuffer(soundB);
-	sound.play();
-	sound.setPlayingOffset(sf::seconds(7));
-	usleep(4E+6);
-	soundB.loadFromFile("../music/partenza.wav");
-	sound.setVolume(100);
-	sound.play();
+	soundB.loadFromFile("../music/countdown.wav"); //
+	sound.setBuffer(soundB);		       //
+	sound.play();			  	       //	Inizializzazione e inizio del suono per il Countdown
+	sound.setPlayingOffset(sf::seconds(7));        //con un offset di 7 secondi (perchè il suono inizialmente fa partire il countdown da 10
+	usleep(4E+6);				       // 	Aspetta 4 secondi
+	soundB.loadFromFile("../music/partenza.wav");  //	
+	sound.setVolume(100);			       //
+	sound.play();				       //	Avvio del suono della navicella
 	usleep(1E+6);
 }
 
 void start()
 {
-	pthread_t pEnemy;
-	nNemici=6;
+	pthread_t pEnemy; //Dichiarazione del thread pEnemy
+	nNemici=6; //Reinizializzazione del num dei nemici per una partita successiva, il num nemici ad inizio partita deve sempre essere 6
 	WINDOW *win;
 	win=initscr();
 	cbreak();
-	keypad(stdscr, TRUE);
+	keypad(win, TRUE);
 	noecho();
-	nodelay(stdscr, TRUE);
+	nodelay(win, TRUE);
 	curs_set(0);
-	pthread_mutex_init(&mutexGame,NULL);
-	preStart();
-	music.openFromFile("../music/game.wav");
+	pthread_mutex_init(&mutexGame,NULL); //Inizializzazione del mutex per gestire le operazioni dei thread
+	preStart();	// Chiamata alla funzione preStart per il countdown
+	music.openFromFile("../music/game.wav"); 	// Inizializzazione della musica che ci sarà per tutto il gioco
 	music.setVolume(50);
 	music.play();
 	music.setLoop(true);
 	for(int i=0;i<16;i++)
 	{	
-		enemy[i]=new Enemy();
+		enemy[i]=new Enemy();	//Creazione degli oggetti Enemy puntati all'interno dell'array 
 	}
-	pthread_create(&pEnemy, NULL, enemyInit,NULL);
-	playerF();
-	pthread_join(pEnemy,NULL);	
-	music.stop();		
+	pthread_create(&pEnemy, NULL, enemyInit,NULL); //Avvio del Thread pEnemy chiamando la funzione "enemyInit" senza passaggio di parametri
+	playerF(); 	//Chiamata della funzione principale "playerF()" nel quale verrà gestita la navicella
+	pthread_join(pEnemy,NULL);//Quando playerF finirà le sue istruzioni, pthread_join aspetta che finisca il thread pEnemy prima di
+				  //far finire il gioco
+	music.stop();
 }
