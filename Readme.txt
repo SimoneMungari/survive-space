@@ -22,6 +22,9 @@ Ora puoi giocare!
 CONSIGLIO:
 Si consiglia di consultare il TUTORIAL presente nel menù principale del gioco.
 
+ATTENZIONE:
+Occorre imporre il c++ 11 se il compilatore da errori.
+
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,3 +51,6 @@ Now you can play!
 
 ADVICE:
 It is recommended to consult the TUTORIAL present in the main menu of the game.
+
+ATTENTION:
+Compiler must be imposed to use c++ 11, if it gives errors.
