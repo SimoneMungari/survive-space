@@ -42,7 +42,7 @@ void *enemyInit(void *);	 // FUNZIONE THREAD NEMICO
 void startEnemy();		//	FUNZIONI
 void movimentoEnemy();		//	 ENEMY
 
-void controlloDifficolta(bool[]);//	FUNZIONE CONTROLLO DIFFICOLTÀ
+void controlloDifficolta(int&);//	FUNZIONE CONTROLLO DIFFICOLTÀ
 
 int main()
 {	

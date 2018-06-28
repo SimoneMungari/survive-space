@@ -20,6 +20,8 @@ class Player
 		bool sinistra;
 
 	public:	
+		bool bonus;	
+		
 		Player();
 		int getX() const;
 		int getY() const;
@@ -31,8 +33,7 @@ class Player
 		void Giu();	// verso giu
 		void Destra();	// verso destra
 		void Sinistra();// verso sinistra
-		void Cambio_vita(int);
-		void visualizza_stat() const; //Stampa del punteggio e della vita attuale
+		void visualizza_stat(); //Stampa del punteggio e della vita attuale
 		void visualizza_player() const;
 		void cancella_player() const;
 		bool controlloCollisione(int,int) const;

@@ -11,6 +11,7 @@ Player::Player() //Costruttore vuoto
 	this->giu=false;
 	this->destra=false;
 	this->sinistra=false;
+	this->bonus=false;
 }
 
 int Player::getX() const
@@ -93,9 +94,9 @@ void Player::Sinistra()
 	}
 }
 
-void Player::visualizza_stat() const
+void Player::visualizza_stat()
 {
-	if(vita==100)
+	if(vita>=100)
 	{
 		mvprintw(0,COLS-25,"Vita: %d",vita);
 	}
@@ -110,6 +111,15 @@ void Player::visualizza_stat() const
 	 	mvprintw(0,COLS-18,"  ");
 	}
 	mvprintw(1,COLS-25,"Nemici Uccisi: %d",enemyKilled);
+	if(bonus)
+	{
+		mvprintw(2,COLS-30,"BONUS! VITA+10!");
+		if(enemyKilled%53==0)
+		{
+			bonus=false;
+			mvprintw(2,COLS-30,"               ");
+		}
+	}
 }
 
 

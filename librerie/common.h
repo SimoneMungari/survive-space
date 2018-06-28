@@ -16,6 +16,7 @@ extern Player* player;
 extern int dirProiettile;
 extern bool running;
 extern bool reset;
+extern bool bonus;
 extern int nNemici;
 extern string user;
 extern sf::SoundBuffer soundB;
